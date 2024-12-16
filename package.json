@@ -12,12 +12,14 @@
     "start-server": "nodemon --exec babel-node --presets @babel/preset-env ./server.js",
     "start-worker": "nodemon --exec babel-node --presets @babel/preset-env ./worker.js",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
+    "yarn-install": "yarn install",
+    "yarn-start": "yarn start",
     "test": "./node_modules/.bin/mocha --opts mocha.opts tests/**/*.js",
     "test-with-coverage": "nyc --reporter=text ./node_modules/.bin/mocha --opts mocha.opts tests/**/*.js",
     "coveralls": "nyc ./node_modules/.bin/mocha --opts mocha.opts tests/**/*.js && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "bull": "^3.16.0",
+    "bull": "^4.16.4",
     "chai-http": "^4.3.0",
     "dotenv": "^16.0.1",
     "express": "^4.17.1",
@@ -34,13 +36,14 @@
     "@babel/cli": "^7.8.0",
     "@babel/core": "^7.8.0",
     "@babel/node": "^7.8.0",
-    "@babel/preset-env": "^7.8.2",
+    "@babel/preset-env": "^7.26.0",
     "@babel/register": "^7.8.0",
+    "@types/bull": "^4.10.4",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "coveralls": "^3.1.1",
-    "eslint": "^6.4.0",
-    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^28.9.0",
     "mocha": "^11.0.1",
@@ -49,11 +52,13 @@
     "nyc": "^15.1.0",
     "request": "^2.88.0",
     "sinon": "^7.5.0",
-    "supertest": "^6.2.3"
+    "supertest": "^6.2.3",
+    "yarn": "^1.22.22"
   },
   "engines": {
     "node": "16.x",
     "npm": "8.x",
     "yarn": "1.x"
-  }
+  },
+  "packageManager": "yarn@4.5.3"
 }
