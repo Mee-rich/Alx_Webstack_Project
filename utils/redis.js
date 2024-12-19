@@ -1,12 +1,15 @@
 import { promisify } from 'util';
 import { createClient } from 'redis';
 
+
 /**
  * Represents a redis client
  */
 class RedisClient{
     constructor() {
+        
         this.client = createClient();
+        this.client.connect();
         this.isClientConnected = true;
         this.client.on('error', (err) => {
             console.error('Redis client failed to connect:', err.message || err.toString());
@@ -15,7 +18,13 @@ class RedisClient{
         this.client.on('connect', () => {
             this.isClientConnected = true;
         });
+        this.client.on('end', () => {
+            console.warn('Redis client disconnected');
+            this.isClientConnected = false;
+        });
+        
     }
+
 
     /**
      * Checks for active connection
@@ -31,7 +40,8 @@ class RedisClient{
      * @returns {String | Object}
      */
     async get(key) {
-        getAsync = promisify(this.client.GET).bind(this.client);
+        // await this.client.connect();
+        const getAsync = await (this.client.GET).bind(this.client);
         return await getAsync(key);
     }
 
@@ -43,7 +53,8 @@ class RedisClient{
      * @returns {Promise<void>}
      */
     async set(key, value, duration) {
-        setAsync = promisify(this.client.SETEX).bind(this.client);
+        // await this.client.connect();
+        const setAsync = await  (this.client.SETEX).bind(this.client);
         return await setAsync(key, duration, value);
     }
 
@@ -53,7 +64,8 @@ class RedisClient{
      * @return {Promise<void>}
      */
     async del(key) {
-        await promisify(this.client.DEL).bind(this.client)(key);
+        // await this.client.connnect();
+        await (this.client.DEL).bind(this.client)(key);
     }
 }
 

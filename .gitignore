@@ -1,2 +1,3 @@
 # Ignore the list below
 node_modules/*
+redis*

@@ -3,8 +3,9 @@ import AppController from '../controllers/AppController';
 import AuthController from '../controllers/AuthController';
 import MentorController from '../controllers/MentorController';
 import UsersController from '../controllers/UsersController';
+import BlogController from '../controllers/BlogController';
 //import FilesController from '../controllers/FilesController';
-import { basicAuthenticate, xTokenAuthenticate } from '../middlewares/auth';
+import { setAuthHeader, basicAuthenticate, xTokenAuthenticate } from '../middlewares/auth';
 import { APIError, errorResponse } from '../middlewares/error';
 
 
@@ -17,11 +18,15 @@ const injectRoutes = (api) => {
     api.get('/status', AppController.getStatus);
     api.get('/stats', AppController.getStats);
 
-    api.get('/connect', basicAuthenticate, AuthController.getConnect);
+    api.get('/connect', setAuthHeader, basicAuthenticate, AuthController.getConnect);
     api.get('/disconnect', xTokenAuthenticate, AuthController.getDisconnect);
 
     api.post('/users', UsersController.postNew);
     api.get('users/me', xTokenAuthenticate, UsersController.getMe);
+
+    api.post('/blogs', BlogController.blogNew);
+    api.get('blogs/:id', BlogController.getBlogById);
+    api.get('/blogs', BlogController.allBlogs);
 
     api.get('/mentor-count', MentorController.countMentors);
     api.get('/mentee-stats', MentorController.countMenteesPerMentor);

@@ -4,6 +4,28 @@ import mongoDBCore from 'mongodb/lib/core';
 import dbClient from './db';
 import redisClient from './redis';
 
+
+/**
+ * Creates base64Token on user login
+ * @param {Request} req- The Express request object
+ * @returns {base64} token- The authorization token
+ */
+const createAuthorizationHeader = async (req) => {
+    const email = req.body ? req.body.email : null;
+    const password = req.body ? req.body.password : null;
+
+    if (!email || !password) {
+        return null;
+    }
+
+    const base64Token = Buffer.from(`${email}:${password}`).toString('base64');
+
+    return (`Basic ${base64Token}`);
+
+};
+
+
+
 /**
  * Extract the user from the Authorization 
  * header in the given request object
@@ -26,11 +48,13 @@ const getUserFromAuthorization = async (req) => {
         const splitPos = token.indexOf(':');
         const email = token.substring(0, splitPos);
         const password = token.substring(splitPos + 1);
-        const user = await dbClient.usersCollection().findOne({ email });
+
+        const user = await (await dbClient.usersCollection()).findOne({ email });
 
         if (!user || sha1(password) !== user.password) {
             return null;
         }
+
         return user;
 };
 
@@ -59,4 +83,5 @@ const getUserFromXToken = async (req) => {
 export default {
     getUserFromAuthorization: async (req) => getUserFromAuthorization(req),
     getUserFromXToken: async (req) => getUserFromXToken(req),
+    createAuthorizationHeader: async (req) => createAuthorizationHeader(req),
 };

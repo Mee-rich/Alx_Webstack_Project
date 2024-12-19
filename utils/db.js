@@ -1,5 +1,4 @@
 import mongodb from 'mongodb';
-import Collection from 'mongodb/lib/collection';
 import envFetch from './dot_Env';
 
 /**
@@ -13,7 +12,8 @@ class DBClient {
         envFetch();
         const host = process.env.DB_HOST || 'localhost';
         const port = process.env.DB_PORT || 27017;
-        const database = process.env.DB_DATABASE || 'file_manager';
+        //const database = process.env.DB_DATABASE || 'Expero_Database';  This for deployment
+        const database = process.env.DB_DATABASE || 'file_manager';  //This for development
         const dbURL = `mongodb://${host}:${port}/${database}`;
 
         this.client = new mongodb.MongoClient(dbURL, {useUnifiedTopology: true});
@@ -22,7 +22,7 @@ class DBClient {
         // Establish connection
         this.client.connect().then(() => {
             this.connected = true;
-            console.log('Connceted to MongoDB');
+            console.log('Connected to MongoDB');
         }).catch((err) => {
             console.log('Failed to connect to MongoDB:', err);
         });
@@ -33,7 +33,7 @@ class DBClient {
      * @returns {boolean}
      */
     isAlive() {
-        return this.client.isConnected();
+        return this.connected;
     }
 
     /**
@@ -41,23 +41,25 @@ class DBClient {
      * @returns {Promise<Number>}
      */
     async nbUsers() {
-        return this.client.db().collection('users').countDocuments();
+        await this.client.connect();
+        return await this.client.db(this.database).collection('users').countDocuments();
     }
 
     /**
-     * Gets teh number of files in the database.
+     * Gets the number of files in the database.
      * @returns {Promise<Number>}
      */
     async nbFiles() {
-        return this.client.db().collection('files').countDocuments();
+        return await this.client.db(this.database).collection('files').countDocuments();
     }
 
     /**
-     * Gets the reference to the `users` collectoion
-     * @returns {Promise<Colection>}
+     * Gets the reference to the `users` collection
+     * @returns {Promise<Collection>}
      */
     async usersCollection() {
-        return this.client.db().collection('users');
+        await this.client.connect();
+        return this.client.db(this.database).collection('users');
     }
 
     /**
@@ -65,15 +67,26 @@ class DBClient {
      * @returns {Promise<Collection>}
      */
     async filesCollection() {
-        return this.client.db().collection('files');
+        await this.client.connect();
+        return await this.client.db(this.database).collection('files');
     }
+
+    /**
+     * Gets a reference to the 'blogs' collection
+     * @re(turns {Promise<Collection}
+     */
+    async blogsCollection() {
+        await this.client.connect();
+        return await this.client.db(this.database).collection('blogs')
+    }
+
 
     /**
      * Gets the number of mentors in the database
      * @returns {Promise<Number>}
      */
     async countMentors() {
-        return await this.client.db().collection('users').countDocuments({ role: 'mentor' })
+        return await this.client.db(this.database).collection('users').countDocuments({ role: 'mentor' })
     }
 
     /**
@@ -81,11 +94,11 @@ class DBClient {
      * @returns {Promise<Number>}
      */
     async countMenteesPerMentor() {
-        const mentors = await this.client.db().collection('users').countDocuments({ role: 'mentor' });
+        const mentors = await this.client.db(database).collection('users').countDocuments({ role: 'mentor' });
 
         const mentorStats = (Array.isArray(mentors) ? mentors : []).map((mentor) => ({
-            mentorId: mentor._id,
-            menteeCount: mentor.mentees ? mentor.mentees.length : 0,
+            mentorId: details.mentor._id,
+            menteeCount: details.mentees ? details.mentees.length : 0,
         }));
 
         return mentorStats;
