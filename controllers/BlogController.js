@@ -38,7 +38,7 @@ export default class BlogController {
     }
 
     static async getBlogById(req,res) {
-        const blogId = req.body.id.toString();
+        const blogId = req.body.id;
 
         if (!blogId) {
             return res.status(400).json({ error: "Blog ID missing!" });

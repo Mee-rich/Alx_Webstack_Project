@@ -22,7 +22,7 @@ class RedisClient{
             console.warn('Redis client disconnected');
             this.isClientConnected = false;
         });
-        
+        this.client.ping();        
     }
 
 

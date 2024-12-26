@@ -1,8 +1,11 @@
 import sha1 from 'sha1';
+import crypto from 'crypto';
 import { Request } from 'express';
-import mongoDBCore from 'mongodb/lib/core';
+// import mongoDBCore from 'mongodb/lib/core';
 import dbClient from './db';
 import redisClient from './redis';
+import { ObjectId } from 'mongodb';
+import { request } from 'http';
 
 
 /**
@@ -66,7 +69,7 @@ const getUserFromAuthorization = async (req) => {
  * @returns {Promise<{_id: ObjectId, email: string, password: string}>}
  */
 const getUserFromXToken = async (req) => {
-    const token = req.headers['x-token'];
+    const token = req.headers['x-token'] || req.headers['X-Token'];
 
     if (!token) {
         return null;
@@ -75,13 +78,62 @@ const getUserFromXToken = async (req) => {
     if (!userId) {
         return null;
     }
-    const user = await dbClient.usersCollection()
-        .findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
+
+    let fetchId = new ObjectId(userId);
+    const user = await (await dbClient.usersCollection())
+        // .findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
+        .findOne({ _id: fetchId });
     return user || null;
+
 };
+
+/**
+ * Creates a password reset token
+ * @param {req} req- The express request object
+ * @returns {Promise<resetToken: bytes>}
+ */
+const createPasswordResetToken = async (req) => {
+    const email = req.body ? req.body.email : null;
+
+    if (!email) {
+        return null;
+    }
+    const user = await (await dbClient.usersCollection()).findOne({ email });
+
+    if (!user) {
+        return null;
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    // const hashedToken = await bcrypt.hash(token, Number(bcryptSalt));
+    const hashedToken = sha1(token);
+    
+    // const userId = user._id;
+    return { token, hashedToken, user } || null
+}
+
+/**
+ * Confirm password reset token
+ * @param {req} req- The Express api object
+ * @returns {Promise<resetToken: bytes>}
+ */
+const decodePasswordResetToken = async (req) => {
+    const {token } = req.params;
+
+    if (!token) {
+        return null;
+    }
+
+    const hashedTokenNew = await sha1(token);
+    
+    return { hashedTokenNew } || null;
+
+}
 
 export default {
     getUserFromAuthorization: async (req) => getUserFromAuthorization(req),
     getUserFromXToken: async (req) => getUserFromXToken(req),
     createAuthorizationHeader: async (req) => createAuthorizationHeader(req),
-};
+    createPasswordResetToken: async (req) => createPasswordResetToken(req),
+    decodePasswordResetToken: async (req) => decodePasswordResetToken(req),
+}
