@@ -36,7 +36,7 @@ const createAuthorizationHeader = async (req) => {
  * @returns {Promise<{_id: ObjectId, email: string, password: string}>}
  */
 const getUserFromAuthorization = async (req) => { 
-        const authorization = req.headers.authorization || null;
+        const authorization = req.headers.authorization || undefined;
 
         if (!authorization) {
             return null;

@@ -2,3 +2,4 @@
 node_modules/*
 redis*
 credentialMe
+node_modules
