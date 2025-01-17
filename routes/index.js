@@ -19,8 +19,8 @@ const injectRoutes = (api) => {
     api.get('/status', AppController.getStatus);
     api.get('/stats', AppController.getStats);
 
-    api.get('/connect', setAuthHeader, basicAuthenticate, AuthController.getConnect);
-    api.get('/disconnect', xTokenAuthenticate, AuthController.getDisconnect);
+    api.post('/connect', setAuthHeader, basicAuthenticate, AuthController.getConnect);
+    api.post('/disconnect', xTokenAuthenticate, AuthController.getDisconnect);
 
     api.post('/users', UsersController.postNew);
     api.get('/users/me', xTokenAuthenticate, UsersController.getMe);

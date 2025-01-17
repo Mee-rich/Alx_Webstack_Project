@@ -6,6 +6,7 @@ import dbClient from './db';
 import redisClient from './redis';
 import { ObjectId } from 'mongodb';
 import { request } from 'http';
+import { Buffer } from 'buffer';
 
 
 /**
@@ -16,6 +17,7 @@ import { request } from 'http';
 const createAuthorizationHeader = async (req) => {
     const email = req.body ? req.body.email : null;
     const password = req.body ? req.body.password : null;
+
 
     if (!email || !password) {
         return null;
@@ -69,7 +71,7 @@ const getUserFromAuthorization = async (req) => {
  * @returns {Promise<{_id: ObjectId, email: string, password: string}>}
  */
 const getUserFromXToken = async (req) => {
-    const token = req.headers['x-token'] || req.headers['X-Token'];
+    const token = (req.headers['X-token'] || req.headers['X-Token']);
 
     if (!token) {
         return null;

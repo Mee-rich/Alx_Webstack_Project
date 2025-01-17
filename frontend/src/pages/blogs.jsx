@@ -1,92 +1,149 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
+import axiosClient from '../components/AxiosClient';
+import { useNavigate } from 'react-router-dom';
 
-class BlogComponent extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showCreateBlogs: false, // State to toggle between views
-      posts: [], // State to store fetched blog posts
+
+export const Blogs = () => {
+  const [blogs, setBlogs] = useState([]); // Initialize as an array
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch blogs when component mounts
+    const allBlogs = async () => {
+      try {
+        const response = await axiosClient.get('/blogs');
+        setBlogs(response.data.formattedBlogs);
+        setSuccessMessage('Blogs fetched successfully!');
+      } catch (error) {
+        setError(
+          `An error occurred: ${error.response?.data?.message || error.message}. Please try again later.`
+        );
+      }
     };
-  }
 
-  // Fetch blogs from API when component mounts
-  componentDidMount() {
-    axios.get('http://localhost:5000/blogs')
-      .then(res => {
-        this.setState({ blogs : res.data });
-      })
-      .catch(error => {
-        console.error("There was an error fetching the blog posts!", error);
-      });
-  }
+    allBlogs();
+  }, []); // Empty dependency array ensures it runs only once
 
-  // Method to render list of blogs
-  blogs() {
-    return (
-      <div>
-        <h2>Blogs</h2>
+  return (
+    <div>
+      <h2>Blogs</h2>
+      {/* Display error and success messages */}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+
+      {/* Conditional rendering for blogs */}
+      {blogs.length > 0 ? (
         <ul>
-          {this.state.blogs.map(blog => (
+          {blogs.map((blog) => (
             <li key={blog.id}>
               <h3>{blog.title}</h3>
-              <h3>{blog.snippet}</h3>
+              <p>{blog.snippet}</p>
               <p>{blog.content}</p>
             </li>
           ))}
         </ul>
-      </div>
-    );
+      ) : (
+        !error && <p>Loading blogs...</p> // Display loading message if no error
+      )}
+    </div>
+  );
+};
+
+
+
+export const CreateBlog = () => {
+  const [title, setTitle] = useState('');
+  const [snippet, setSnippet] = useState('');
+  const [content, setContent] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState('');
+
+  let navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Reset the message and error
+    setError('');
+    setSuccessMessage('');
+
+    // Start loading indicator
+    setLoading(true);
+
+    try {  
+      const response = axiosClient.post(
+        '/blogs',
+        {
+          title,
+          snippet,
+          content
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+       if (response.data) {
+        setSuccessMessage('New blog added!')
+        setSnippet('')
+        setContent('')
+        setTitle('')
+      } else {
+        setError('Unable to add blog.')
+      }
+    } catch (error) {
+        setError(`An error ${error.response?.data?.message || error.message} occurred. Please try again later.`)
+    }
+
+    alert('Blog created')
+    navigate('/blogs')
+    
   }
 
-  // Method to render create blog form
-  createBlogs() {
-    return (
-      <div>
+  return (
+    <div>
         <h2>Create a New Blog</h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <label>
             Title:
-            <input type="text" name="title" required />
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </label>
           <br />
           <label>
             Snippet:
-            <textarea name="snippet" required></textarea>
+            <textarea
+              name="snippet"
+              value={snippet}
+              onChange={(e)=> setSnippet(e.target.value)}
+              required
+            ></textarea>
           </label>
           <br />
           <label>
             Content:
-            <textarea name="body" required></textarea>
+            <textarea
+              name="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+            ></textarea>
           </label>
           <br />
-          <button type="submit">Submit</button>
+          <button type="submit" disabled={loading}> {loading ? 'Creating blog' : 'Create blog'}</button>
         </form>
+        {successMessage && <p style={{color:'green'}}>{successMessage}</p>}
+        {error && <p style={{color:'red'}}>{error}</p>}
       </div>
-    );
-  }
-
-  // Toggle between viewing blogs and creating a new blog
-  toggleView = () => {
-    this.setState((prevState) => ({
-      showCreateBlogs: !prevState.showCreateBlogs,
-    }));
-  };
-
-  // Render method
-  render() {
-    const { showCreateBlogs } = this.state;
-
-    return (
-      <div>
-        <h1>Blog Page</h1>
-        <button onClick={this.toggleView}>
-          {showCreateBlogs ? 'View Blogs' : 'Create Blog'}
-        </button>
-        {showCreateBlogs ? this.createBlogs() : this.blogs()}
-      </div>
-    );
-  }
+  );
 }
 
-export default BlogComponent;

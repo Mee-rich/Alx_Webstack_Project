@@ -17,17 +17,19 @@ const { createAuthorizationHeader, getUserFromXToken, getUserFromAuthorization, 
 export const setAuthHeader = async (req, res, next) => {
     const base64Token = await createAuthorizationHeader(req);
 
-    if (!base64Token) {
-        res.status(400).json({ error: 'Error creating Basic Authorization token'});
+    try{
+        if (!base64Token) {
+            throw new Error('Error creating Basic Authorization token')
+            
+        }
+        req.headers['authorization'] = base64Token;
+        next();
+
+
+    } catch (error){
+        res.status(400).json({ error: error.message });
     }
-    req.headers.authorization = base64Token;
 
-    // res.status(200).json({
-    //     message: 'Authorization token created successfully',
-    //     authorizationHeader: base64Token,  // Return the generated Base64 token
-    // });
-
-    next();
 };
 
 /**
@@ -43,7 +45,6 @@ export const basicAuthenticate = async (req, res, next) => {
         res.status(401).json({ error: 'Unauthorized'});
         return;
     }
-    // res.status(200).json({ message: `${user.email} authorized`});
 
     req.user = user;
     next();

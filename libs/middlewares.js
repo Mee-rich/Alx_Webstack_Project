@@ -2,6 +2,8 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 
+
+
 /**
  * Adds middlewares to the given express application.
  * @param {express.Express} api- The express application.

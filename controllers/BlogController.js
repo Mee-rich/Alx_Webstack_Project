@@ -21,6 +21,10 @@ export default class BlogController {
             return res.status(400).json({ error: 'Blog content missing!' });
         }
 
+        const blog = await (await dbClient.blogsCollection()).findOne({ title });
+        if (blog.title) {
+            return res.status(400).json({ error: 'Blog title not available!'})
+        }
         // checking if the blog was posted by a mentor
 
 
