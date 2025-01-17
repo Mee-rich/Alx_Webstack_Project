@@ -258,7 +258,7 @@ export const Login = () => {
           />
         </div>
         <button type="submit" disabled={loading}>
-          {loading ? 'Loging in...' : 'Login'}
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </>

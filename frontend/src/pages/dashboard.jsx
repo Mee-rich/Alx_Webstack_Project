@@ -22,12 +22,13 @@ export const Dashboard = () => {
         const response = await axiosClient.get("/users/me", {
           headers: {
             "Content-Type": "application/json",
-            "X-token": token,
+            // "X-token": token,
+            // 'X-token': localStorage.getItem('ExperoAuth')
           },
         });
 
         if (response) {
-          setUser(response); 
+          setUser(response.data.user[0]); 
           setSuccessMessage("User data loaded successfully!");
         } else {
           setError("No user data in storage");

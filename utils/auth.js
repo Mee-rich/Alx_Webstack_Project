@@ -71,7 +71,7 @@ const getUserFromAuthorization = async (req) => {
  * @returns {Promise<{_id: ObjectId, email: string, password: string}>}
  */
 const getUserFromXToken = async (req) => {
-    const token = (req.headers['X-token'] || req.headers['X-Token']);
+    const token = req.headers['x-token'];
 
     if (!token) {
         return null;
@@ -81,11 +81,13 @@ const getUserFromXToken = async (req) => {
         return null;
     }
 
+    console.log("Auth Token:", token);
+
     let fetchId = new ObjectId(userId);
     const user = await (await dbClient.usersCollection())
         // .findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
         .findOne({ _id: fetchId });
-    return user || null;
+    return [user, token] || null;
 
 };
 

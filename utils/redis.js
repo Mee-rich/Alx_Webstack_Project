@@ -9,6 +9,8 @@ class RedisClient{
     constructor() {
         
         this.client = createClient();
+        // this.client.options.maxRetriesPerRequest= 50;
+        // this.client.options.retryStrategy = (times) => Math.min(times * 50, 2000);
         this.client.connect();
         this.isClientConnected = true;
         this.client.on('error', (err) => {
@@ -23,8 +25,6 @@ class RedisClient{
             this.isClientConnected = false;
         });
         this.client.ping();
-        
-        this.client.maxRetriesPerRequest = null;
     }
 
 

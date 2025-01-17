@@ -60,7 +60,7 @@ export const xTokenAuthenticate = async (req, res, next) => {
     const user = await getUserFromXToken(req);
 
     if (!user) {
-        res.status(401).json({ error: 'Unauthorized' });
+        res.status(401).json({ error: 'Unauthorized_TOken Issue'});
         return;
     }
     req.user = user;
