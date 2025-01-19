@@ -52,31 +52,31 @@ $ npm run dev
 ## Web pages
 
 1. To sign up
-'''bash
+```bash
     http://localhost:5173/signup
-'''
+```
 
 2. To login
-'''bash
+```bash
     http://localhost:5173/login
-'''
+```
 
 3. To update details
-'''bash
+```bash
     http://localhost:5173/update_details
-'''
+```
 
 4. To view dashboard
 
-'''bash
+```bash
     http://localhost:5173/dashboard
-'''
+```
 
 5. To view blogs
 
-'''bash
+```bash
     http://localhost:5173/blogs
-'''
+```
 
 6. To create blogs
 
