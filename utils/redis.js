@@ -5,12 +5,21 @@ import { createClient } from 'redis';
 /**
  * Represents a redis client
  */
-class RedisClient{
+class RedisClient {
     constructor() {
-        
-        this.client = createClient();
-        // this.client.options.maxRetriesPerRequest= 50;
-        // this.client.options.retryStrategy = (times) => Math.min(times * 50, 2000);
+
+        this.client = createClient({
+            maxRetriesPerRequest: 50,  // Retry failed requests up to 50 times
+            retryStrategy: (times) => Math.min(times * 50, 2000), //Custom backoff
+
+            connectTimeout: 10000,  // Timeout for connecting to Redis
+            enableReadyCheck: false,
+            maxRetriesPerRequest: 50, // Increase retries
+            // Use connection pooling
+            connectionOptions: {
+                maxConnections: 10,  // Maximum number of connections
+            },
+        });
         this.client.connect();
         this.isClientConnected = true;
         this.client.on('error', (err) => {
@@ -32,7 +41,7 @@ class RedisClient{
      * Checks for active connection
      * @returns {boolean}
      */
-    isAlive(){
+    isAlive() {
         return this.isClientConnected;
     }
 
@@ -56,7 +65,7 @@ class RedisClient{
      */
     async set(key, value, duration) {
         // await this.client.connect();
-        const setAsync = await  (this.client.SETEX).bind(this.client);
+        const setAsync = await (this.client.SETEX).bind(this.client);
         return await setAsync(key, duration, value);
     }
 

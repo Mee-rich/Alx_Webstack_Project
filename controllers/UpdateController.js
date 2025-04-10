@@ -4,27 +4,34 @@ import sha1 from 'sha1';
 
 export default class UpdateController {
     static async updateDetails (req, res) {
-        const user = req.user || null;
-
-        const {...otherDetails} = req.body;
-
-        if (!otherDetails) {
-            return res.status(401).json({ error: 'Other details missing!'});
+        const user = req.user[0];
+        if (!user) {
+            return res.status(401).json({error: 'User does not exist!'})
         }
+
+        const {...otherDetails} = req.body.formData;
+
+        if (!otherDetails || Object.keys(otherDetails).length=== 0) {
+            return res.status(401).json({ error: 'Update details missing!'});
+        };
 
         if (req.body.password) {
             return res.status(401).json({ error: 'Password in update info!'})
-        }
+        };
 
         const email = user.email;
+        if (!email) {
+            return res.status(401).json({error: 'User does not exist!'})
+        }
         
         const updateData = await (await dbClient.usersCollection())
             .updateOne(
                 { email },
-                { $set:{...otherDetails} },
+                { $set: {'otherDetails': otherDetails}},
             )
 
-        res.status(200).json({ user, updateData });
+        // res.status(200).json({ user, updateData });
+        res.status(200).json({otherDetails})
     }
 
     static async updatePassword (req, res) {

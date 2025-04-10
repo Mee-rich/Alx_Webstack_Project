@@ -76,8 +76,8 @@ export default class UsersController {
         res.status(200).json({ 
             // email: user.email, 
             // id: user._id.toString(), 
-            //role: user.role.toString(),
-            //details: user.details.toString(),
+            // role: user.role.toString(),
+            // details: user.details.toString(),
             user
         });
     }

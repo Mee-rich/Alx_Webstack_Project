@@ -1,4 +1,4 @@
-import mongodb from 'mongodb';
+import {MongoClient} from 'mongodb';
 import envFetch from './dot_Env';
 
 /**
@@ -16,7 +16,7 @@ class DBClient {
         const database = process.env.DB_DATABASE || 'file_manager';  //This for development
         const dbURL = `mongodb://${host}:${port}/${database}`;
 
-        this.client = new mongodb.MongoClient(dbURL, {useUnifiedTopology: true});
+        this.client = new MongoClient(dbURL, {useUnifiedTopology: true});
         this.connected = false;
     
         // Establish connection

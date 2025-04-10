@@ -10,6 +10,7 @@ import cors from "cors";
  */
 const injectMiddlewares = (api) => {
     api.use(express.json({ limit: '200mb' }));
+    api.use(express.urlencoded({ extended: true }))
     api.use(express.static(path.join(__dirname, 'public')));
     api.use(cors({origin: 'http://localhost:5173'}));
     api.use(express.urlencoded({ extended: false }));

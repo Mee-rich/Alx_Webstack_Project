@@ -1,7 +1,7 @@
 import sha1 from 'sha1';
 import crypto from 'crypto';
 import { Request } from 'express';
-// import mongoDBCore from 'mongodb/lib/core';
+// import { mongoDBCore } from 'mongodb/lib/core';
 import dbClient from './db';
 import redisClient from './redis';
 import { ObjectId } from 'mongodb';
@@ -83,11 +83,11 @@ const getUserFromXToken = async (req) => {
 
     console.log("Auth Token:", token);
 
-    let fetchId = new ObjectId(userId);
+    // let fetchId = new ObjectId(userId);
     const user = await (await dbClient.usersCollection())
         // .findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
-        .findOne({ _id: fetchId });
-    return [user, token] || null;
+        .findOne({ _id: new ObjectId(userId)});
+    return [user, token];
 
 };
 

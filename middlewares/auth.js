@@ -64,7 +64,7 @@ export const xTokenAuthenticate = async (req, res, next) => {
         return;
     }
     req.user = user;
-
+    // res.status(200).json({user});
     next();
 };
 
